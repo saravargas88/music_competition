@@ -1,7 +1,3 @@
-
-
-
-
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel 
 import uvicorn 
@@ -46,7 +42,7 @@ async def generate_music(request: MusicRequest, background_tasks: BackgroundTask
                 
         #LOAD THE MusicGen MODEL!
         
-        synthesizer= pipeline("text-to-audio-generation", model="facebook/musicgen-large", device=0 if device.type=='cuda' else -1 )
+        synthesizer= pipeline("text-to-audio", model="facebook/musicgen-small", device=0 if device.type=='cuda' else -1 )
         print("Model loaded successfully")
         
         #Generate 4 music generative agents
@@ -63,7 +59,8 @@ async def generate_music(request: MusicRequest, background_tasks: BackgroundTask
             #do_sample=True this enables sampling instead of just greedy next likely token
             #top_k=50: tihs limits sampling to 50  most likely tokens
             #top_p =0.95: limits sampling to the top 95% of  probability mass 
-            output = synthesizer(request.prompt, max_new_tokens=request.duration*50, 
+            output = synthesizer(request.prompt,
+                                 duration=request.duration, 
                                  do_sample=True, 
                                  top_k=50, 
                                  top_p=0.95, 
